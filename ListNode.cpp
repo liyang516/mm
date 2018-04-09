@@ -4,7 +4,7 @@
 #include <string>
 #include <iostream>
 #include <math.h>
-
+#include <stack>
 using namespace std;
 
 //链表定义
@@ -45,6 +45,54 @@ ListNode* CreateList(int num)
 	return head;
 }
 
+// 输出链表
+void PrintList(ListNode *head)
+{
+	if(NULL==head)
+		return;
+	while(head)
+	{
+		cout<<head->data;
+		head = head->next;
+	}
+	cout<<endl;
+}
+
+// 逆向输出链表,利用栈
+void PrintListReverse(ListNode *head)
+{
+	if(head==NULL)
+		return ;
+
+	stack<int> st;
+	while(head!=NULL)
+	{
+		st.push(head->data);
+		head = head->next;
+	}
+
+	while(!st.empty())
+	{
+		cout<<st.top();
+		st.pop();
+	}
+	cout<<endl;
+	return;
+}
+
+// 逆向输出链表,利用递归
+void PrintListReverseRecursive(ListNode *head)
+{
+	if(head!=NULL)
+	{
+		if(head->next!=NULL)
+			PrintListReverseRecursive(head->next);
+		cout<<head->data;
+	}
+	// cout<<endl;
+	return;
+}
+
 // 链表逆序
 ListNode* ReverseList(ListNode *head)
 {
@@ -66,18 +114,7 @@ ListNode* ReverseList(ListNode *head)
 	return ReverseHead;
 }
 
-// 输出链表
-void PrintList(ListNode *head)
-{
-	if(NULL==head)
-		return;
-	while(head)
-	{
-		cout<<head->data;
-		head = head->next;
-	}
-	cout<<endl;
-}
+
 
 // 合并两个有序列表
 ListNode* MergeList(ListNode *head1, ListNode*head2)
@@ -196,6 +233,43 @@ ListNode* FindKthToTail(ListNode *head, unsigned int k)
 	}
 	return pBehind;
 
+}
+
+// 给定一个节点，在链表中删除该节点
+void DeleteListNode(ListNode **head, ListNode *deleteNode)
+{
+	if(!head||!deleteNode)
+		return;
+
+	// 链表只有一个节点的情况
+	if(*head == deleteNode)
+	{
+		delete deleteNode;
+		deleteNode = NULL;
+		*head = NULL;
+	}
+
+	// 链表有多个节点，删除节点不是链表的最后一个节点
+	else if(deleteNode->next!=NULL)
+	{
+		ListNode *pNext = deleteNode->next;
+		deleteNode->data = pNext->data;
+		deleteNode->next = pNext->next;
+		delete pNext;
+		pNext = NULL;
+	}
+
+	// 链表有多个节点，删除节点是链表的最后一个节点
+	else
+	{
+		ListNode *pNode = *head;
+		while(pNode->next!=deleteNode)
+			pNode = pNode->next;
+		pNode->next = NULL;
+		delete deleteNode;
+		deleteNode = NULL;
+	}
+	return ;
 }
 
 int Add(int a, int b)
