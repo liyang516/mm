@@ -81,7 +81,7 @@ void BFS(BiTNode *Tree)
 	BiTNode *pNode;
 	while(!queueTree.empty())
 	{
-		*pNode = queueTree.front();
+		pNode = queueTree.front();
 		cout<<pNode->data;
 		if(pNode->lchild!=NULL)
 			queueTree.push(pNode->lchild);
@@ -92,18 +92,54 @@ void BFS(BiTNode *Tree)
 	cout<<endl;
 }
 
+// 分行从上到下打印二叉树
+void PrintTreeByLine(BiTNode *Tree)
+{
+	if(Tree==NULL)
+		return;
+	queue<BiTNode*> Q;
+	Q.push(Tree);
+	int nextLevel = 0;
+    int toBePrinted = 1;
+	while(!Q.empty())
+	{
+		BiTNode *pNode = Q.front();
+		cout<<pNode->data;
+		if(pNode->lchild)
+		{
+			Q.push(pNode->lchild);
+			nextLevel++;
+		}
+		if(pNode->rchild)
+		{
+			Q.push(pNode->rchild);
+			nextLevel++;
+		}
+		Q.pop();
+		--toBePrinted;
+        if(toBePrinted == 0)
+        {
+            printf("\n");
+            toBePrinted = nextLevel;
+            nextLevel = 0;
+        }
+
+	}
+	// cout<<endl;
+}
+
 int main(int argc, char const *argv[])
 {
 	/* code */
 	BiTNode *Tree;
 	CreateBiTree(Tree);
-	PreOrder(Tree);
-	cout<<endl;
-	InOrder(Tree);
-	cout<<endl;
-	LastOrder(Tree);
-	cout<<endl;
-	cout<<BiTreeHeight(Tree)<<endl;
-	BFS(Tree);
+	// PreOrder(Tree);
+	// cout<<endl;
+	// InOrder(Tree);
+	// cout<<endl;
+	// LastOrder(Tree);
+	// cout<<endl;
+	// cout<<BiTreeHeight(Tree)<<endl;
+	PrintTreeByLine(Tree);
 	return 0;
 }
