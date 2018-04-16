@@ -20,12 +20,10 @@ ListNode* CreateList(int num)
 	if(num<=0)
 		return NULL;
 
-	// ListNode *head = NULL,*s = NULL;
 	ListNode *head = NULL,*s = NULL, *p = NULL;
 
 	for(int i=0;i<num;i++)
 	{
-		// ListNode *p = (ListNode*)malloc(sizeof(ListNode));
 		p = (ListNode*)malloc(sizeof(ListNode));
 		int tmp_data;
 		cin>>tmp_data;
@@ -64,16 +62,16 @@ void PrintListReverse(ListNode *head)
 	if(head==NULL)
 		return ;
 
-	stack<int> st;
+	stack<ListNode*> st;
 	while(head!=NULL)
 	{
-		st.push(head->data);
+		st.push(head);
 		head = head->next;
 	}
 
 	while(!st.empty())
 	{
-		cout<<st.top();
+		cout<<st.top()->data;
 		st.pop();
 	}
 	cout<<endl;
@@ -188,6 +186,8 @@ ListNode* EntryNodeOfLoop(ListNode *head)
 		return NULL;
 	ListNode *pNode1 = meetNode;
 	int loopNum = 1;
+	
+	//先求环的长度
 	while(pNode1->next != meetNode)
 	{
 		++loopNum;
@@ -211,7 +211,7 @@ ListNode* EntryNodeOfLoop(ListNode *head)
 // 输出该链表中倒数第k个结点
 ListNode* FindKthToTail(ListNode *head, unsigned int k)
 {
-	if(head==NULL && k<=0)
+	if(head==NULL || k<=0)
 		return NULL;
 
 	ListNode *pAhead = head;

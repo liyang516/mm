@@ -6,6 +6,7 @@
 #include <iostream>
 #include <stack>
 #include <queue>
+#include <math.h>
 using namespace std;
 
 // 面试题58（一）：翻转单词顺序
@@ -119,19 +120,111 @@ bool IsPopOrder(const int *Push, const int *Pop, int length)
 	return result;
 }
 
+// 面试题10：斐波那契数列
+// 题目：写一个函数，输入n，求斐波那契（Fibonacci）数列的第n项。
+long FibonacciRecursive(unsigned int n)
+{
+	if(n<=0)
+		return 0;
+	if(n==1)
+		return 1;
+	return FibonacciRecursive(n-1) + FibonacciRecursive(n-2);
+}
+
+long Fibonacci(unsigned int n)
+{
+	int result[] = {0,1};
+	if(n<2)
+		return result[n];
+	long num1 = 0;
+	long num2 = 1;
+	long FibN = 0;
+	for(int i=2;i<=n;i++)
+	{
+		FibN = num1 + num2;
+		num1 = num2;
+		num2 = FibN;
+	}
+	return FibN;
+}
+
+// 面试题14：剪绳子
+// 题目：给你一根长度为n绳子，请把绳子剪成m段（m、n都是整数，n>1并且m≥1）。
+// 每段的绳子的长度记为k[0]、k[1]、……、k[m]。k[0]*k[1]*…*k[m]可能的最大乘
+// 积是多少？例如当绳子的长度是8时，我们把它剪成长度分别为2、3、3的三段，此
+// 时得到最大的乘积18。
+int getMaxProduct(int length)
+{
+	if(length<2)
+		return 0;
+	if(length==2)
+		return 1;
+	if(length==3)
+		return 2;
+	int timesOf3 = length/3;
+	if(length - timesOf3*3==1)
+		timesOf3--;
+	int timesOf2 = (length - timesOf3*3)/2;
+
+	return pow(3,timesOf3) * pow(2,timesOf2);
+}
+
+
+
+// 面试题16：数值的整数次方
+// 题目：实现函数double Power(double base, int exponent)，求base的exponent
+// 次方。不得使用库函数，同时不需要考虑大数问题。
+bool equal(double a, double b)
+{
+	if(a-b>-0.0000001 && a-b<0.0000001)
+		return true;
+	else
+		return false;
+}
+
+double PowerWithUnsignedExponent(double base, unsigned int exponent)
+{
+	double result = 1.0;
+	for(int i=1;i<=exponent;i++)
+		result *= base;
+	return result;
+}
+
+double Power(double base, int exponent)
+{
+	double result = 0.0;
+	if(equal(base,0.0) && exponent<0)
+	{
+		cout<<"input para is error"<<endl;
+		return 0.0;
+	}
+	unsigned int absExponent;
+	if(exponent<0)
+		absExponent = (unsigned int)(-exponent);
+	else
+		absExponent = (unsigned int)(exponent);
+
+	result = PowerWithUnsignedExponent(base, absExponent);
+	if(exponent<0)
+		result = 1.0/result;
+	return result;
+}
+
 
 int main(int argc, char const *argv[])
 {
 	/* code */
-	int Push[5] = {1,2,3,4,5};
+	// int Push[5] = {1,2,3,4,5};
 	// int Pop[] = {4,5,3,2,1};
-	int Pop[5] = {4,3,5,1,2};
-	cout<<IsPopOrder(Push,Pop,5)<<endl;
+	// int Pop[5] = {4,3,5,1,2};
+	// cout<<IsPopOrder(Push,Pop,5)<<endl;
 	// char str[] = "I am a student.";
 	// char str2[] = "1234567";
 	// ReverseSentence(str);
 	// LeftRotateString(str2,2);
 	// cout<<str<<endl;
 	// cout<<str2<<endl;
+
+	cout<<Power(2.0,0)<<endl;
 	return 0;
 }

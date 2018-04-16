@@ -46,7 +46,7 @@ int Strcmp(const char *s1, const char *s2)
 //strcat函数
 char *Strcat(char *dest, const char *src)
 {
-	if(dest==NULL || src==NULL)
+	if(dest==NULL && src==NULL)
 		return NULL;
 	char *addr = dest;
 	while(*dest!='\0')
@@ -152,10 +152,8 @@ int atoi(const char *str)
 	{
 		if(*str<'0'||*str>'9')
 			break;
-		else
-		{
-			result = result*10 + (*str-'0');
-		}
+	
+		result = result*10 + (*str-'0');
 		str++;
 	}
 	if(*addr == '-')

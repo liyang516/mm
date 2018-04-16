@@ -7,6 +7,7 @@
 
 using namespace std;
 
+//打印数组
 void PrintArray(int a[],int len)
 {
 	for(int i=0;i<len;i++)
@@ -29,7 +30,8 @@ void Swap(int &a, int &b)
 	a = a^b;
 }
 
-// 冒泡排序,相邻元素两两比较,大的往后放,一次循环后,最大的出现在最后面
+// 冒泡排序:
+// 相邻元素两两比较,大的往后放,一次循环后,最大的出现在最后面
 void BubbleSort(int a[], int num)
 {
 	if(NULL==a || num<=0)
@@ -44,7 +46,8 @@ void BubbleSort(int a[], int num)
 	}
 }
 
-// 选择排序,第i(i=0,1,2...)个元素依次和后面的元素比较,小的放前面,第一次循环后,最小的出现在最左侧
+// 选择排序:
+// 第i(i=0,1,2...)个元素依次和后面的元素比较,小的放前面,第一次循环后,最小的出现在最左侧
 void SelectSort(int a[], int num)
 {
 	if(NULL==a||num<=0)
@@ -59,7 +62,8 @@ void SelectSort(int a[], int num)
 	}
 }
 
-//插入排序,将前i个元素假象为有序数组，对前i个元素进行排序，小的往前放
+//插入排序:
+// 将前i个元素假象为有序数组，对前i个元素进行排序，小的往前放
 void InsertSort(int a[], int num)
 {
 	if(NULL==a||num<=0)
@@ -77,7 +81,8 @@ void InsertSort(int a[], int num)
 	}
 }
 
-// 快速排序,每次循环选一个基准值,比基准值小的放在基准值左边,比基准值大的放在基准值右边
+// 快速排序:
+// 每次循环选一个基准值,比基准值小的放在基准值左边,比基准值大的放在基准值右边
 int getPartition(int a[], int low, int high)
 {
 	if(NULL==a||low>high)
@@ -106,7 +111,8 @@ void QuickSort(int a[], int low, int high)
 	}
 }
 
-// 归并排序,采用分治思想(合并有序数组),先将数组分成一个个小数组进行排序，在合并各个小数组
+// 归并排序:
+// 采用分治思想(合并有序数组),先将数组分成一个个小数组进行排序，在递归合并各个小数组
 void MergeArray(int a[], int low, int mid,int high, int pArray[])
 {
 	int i=low,j=mid+1;
@@ -150,21 +156,7 @@ int MergeSort(int a[], int num)
 	return 1;
 }
 
-//剪绳子
-int getMaxProduct(int length)
-{
-	if(length<2)
-		return 0;
-	if(length==2)
-		return 1;
-	if(length==3)
-		return 2;
-	int timesOf3 = length/3;
-	if(length - timesOf3*3 == 1)
-		timesOf3--;
-	int timesOf2 = (length - timesOf3*3)/2;
-	return pow(3,timesOf3)*pow(2,timesOf2);
-}
+
 
 // 求一个整数二进制格式中1的个数
 int getNumberOf1InBinary(int num)
