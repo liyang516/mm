@@ -1,0 +1,470 @@
+一、字符串和编码：(python默认的文件编码是ascii)
+ASCII编码：8个比特（bit）作为一个字节（byte），美国人发明，最早只有127个字母被编码到计算机里，也就是大小写英文字母、数字和一些符号。
+GB2312编码：中国制定，用来把中文编进去。处理中文显然一个字节是不够的，至少需要两个字节，而且还不能和ASCII编码冲突。
+Shift_JIS：日文编码
+Euc-kr：韩文编码
+
+Unicode编码：Unicode把所有语言都统一到一套编码里，这样就不会再有乱码问题了。最常用的是用两个字节表示一个字符
+
+ASCII编码和Unicode编码的区别：ASCII编码是1个字节，而Unicode编码通常是2个字节。
+                              用Unicode编码比ASCII编码需要多一倍的存储空间，在存储和传输上就十分不划算。
+                              
+UTF-8编码：可变长编码。UTF-8编码把一个Unicode字符根据不同的数字大小编码成1-6个字节，常用的英文字母被编码成1个字节，
+汉字通常是3个字节，只有很生僻的字符才会被编码成4-6个字节。如果你要传输的文本包含大量英文字符，用UTF-8编码就能节省空间
+
+
+在计算机内存中，统一使用Unicode编码，当需要保存到硬盘或者需要传输的时候，就转换为UTF-8编码。
+用记事本编辑的时候，从文件读取的UTF-8字符被转换为Unicode字符到内存里，编辑完成后，保存的时候再把Unicode转换为UTF-8保存到文件
+
+二、xrange和range的区别：****xrange每次只返回一个元素，而range一次性返回一个list，占用内存大****
+
+xrange的用法：xrange(start,end,step),生成一个xrange对象，类似生成器的概念，
+range的用法：range(start,end,step),生成一个列表
+
+xrange的用法：
+1、当需要操作一个非常大的数据，而且内存比较吃紧的时候，可以用xrange来操作节省内存
+2、xrange一般用在循环里，比如只需要操作部分数据的话，而不是返回全部元素老完成操作，推荐用xrange
+
+
+三、集合  无序  只存储key，没有value
+
+1、set(可变的集合)：a = set([1,2,3]) or a = set('abc') or a = set((4,5,6))
+2、frozeset(不可变的集合)
+
+集合方法：add(),update(),remove()
+集合成员关系：in，not in
+集合交集、并集、差集：& | -
+
+四、字符串模板输出
+1、'%s is a %s' % ('i', 'boy')                             #普通方式
+2、'%(who)s is a %(gender)s' % {'who':'he', 'gender':'boy'} #字典方式
+3、'{who} is a {gender}'.format(who='she', gender='girl')   #字符串format函数方式
+   '{} is a {}'.format('she', 'girl') 
+   
+五、print语句文件流重定向
+	f = open('print.txt','w')
+	print >> f,'abcd'
+	print >> f,'efgh'
+	f.close()
+
+六、目录与文件操作
+	module：os、shutil
+	module function：
+		os.listdir(path) list一个目录
+		os.remove(file)  删除一个文件
+		os.rmdir(path)   删除一个空目录
+		os.rmmovedirs(path) 循环删除空目录及其子目录
+		os.path.isdir(path) 判断是一个目录
+		os.path.join(path,file) 路径拼接
+		
+		shutil.rmtree(path)  直接删除一个目录
+
+七、class语法装饰
+	@property:    属性方法
+	@staticmethod:静态方法
+	@classmethod: 
+
+八、print语句实质：
+	在python中，print语句其实只是一种简写形式，是下面这段程序的简写：
+	import sys
+	sys.stdout.write(str(x) + '\n')
+	就是说print语句调用了stdout的wirte函数，所以可以把stdout赋为别的值，从而实现print的输出重定向的功能。比如：
+	import sys
+	x='I am here'
+	fp=file('log.txt','a')
+	sys.stdout = fp
+	print x
+	
+	sys.stdout=sys.__stdout__  #sys.stdout恢复
+	
+九、repr和str
+	repr是一个函数，str是一个类型
+	repr、str、和反引号(``)是将Python的值转换为字符串的3种方法，函数str让字符串更容易阅读，
+而repr(和反引号)则把结果字符串转换为合法的Python表达式。
+	例如：
+	print repr('Hello,world') -> 'Hello,world'
+	print str('Hello,world')  -> Hello,world
+	
+	print repr(10000L) -> 10000L
+	print str(10000L)  -> 10000
+	
+	注意：repr(和反引号)把结果字符串转换为合法的Python表达式
+
+十、input和raw_input
+	input会假设用户输入的是合法的Python表达式
+	raw_input会把所有的输入当做原始数据(raw data),然后放入字符串中
+	
+	例如：
+	name = input('What is your name') 用户必须输入'Li Yang'而不能输入Li yang
+	name = raw_input('What is your name') 可以输入Li yang
+
+十一、正则表达式：import re
+	^	匹配字符串的开头
+	$	匹配字符串的末尾。
+	.	匹配任意字符，除了换行符，当re.DOTALL标记被指定时，则可以匹配包括换行符的任意字符。
+	[...]	用来表示一组字符,单独列出：[amk] 匹配 'a'，'m'或'k'
+	[^...]	不在[]中的字符：[^abc] 匹配除了a,b,c之外的字符。
+	re*	匹配0个或多个的表达式。
+	re+	匹配1个或多个的表达式。
+	re?	匹配0个或1个由前面的正则表达式定义的片段，非贪婪方式
+	re{ n}	
+	re{ n,}	精确匹配n个前面表达式。
+	re{ n, m}	匹配 n 到 m 次由前面的正则表达式定义的片段，贪婪方式
+	a| b	匹配a或b
+	(re)	G匹配括号内的表达式，也表示一个组
+	(?imx)	正则表达式包含三种可选标志：i, m, 或 x 。只影响括号中的区域。
+	(?-imx)	正则表达式关闭 i, m, 或 x 可选标志。只影响括号中的区域。
+	(?: re)	类似 (...), 但是不表示一个组
+	(?imx: re)	在括号中使用i, m, 或 x 可选标志
+	(?-imx: re)	在括号中不使用i, m, 或 x 可选标志
+	(?#...)	注释.
+	(?= re)	前向肯定界定符。如果所含正则表达式，以 ... 表示，在当前位置成功匹配时成功，否则失败。但一旦所含表达式已经尝试，匹配引擎根本没有提高；模式的剩余部分还要尝试界定符的右边。
+	(?! re)	前向否定界定符。与肯定界定符相反；当所含表达式不能在字符串当前位置匹配时成功
+	(?> re)	匹配的独立模式，省去回溯。
+	\w	匹配字母数字及下划线
+	\W	匹配非字母数字及下划线
+	\s	匹配任意空白字符，等价于 [\t\n\r\f].
+	\S	匹配任意非空字符
+	\d	匹配任意数字，等价于 [0-9].
+	\D	匹配任意非数字
+	\A	匹配字符串开始
+	\Z	匹配字符串结束，如果是存在换行，只匹配到换行前的结束字符串。c
+	\z	匹配字符串结束
+	\G	匹配最后匹配完成的位置。
+	\b	匹配一个单词边界，也就是指单词和空格间的位置。例如， 'er\b' 可以匹配"never" 中的 'er'，但不能匹配 "verb" 中的 'er'。
+	\B	匹配非单词边界。'er\B' 能匹配 "verb" 中的 'er'，但不能匹配 "never" 中的 'er'。
+	\n, \t, 等.	匹配一个换行符。匹配一个制表符。等
+	\1...\9	匹配第n个分组的内容。
+	\10	匹配第n个分组的内容，如果它经匹配。否则指的是八进制字符码的表达式。
+
+
+
+
+十二、Python 标准输出 sys.stdout 重定向
+①：sys.stdout 与 print
+当我们在 Python 中打印对象调用 print obj 时候，事实上是调用了 sys.stdout.write(obj+'\n')
+print 将你需要的内容打印到了控制台，然后追加了一个换行符
+print 会调用 sys.stdout 的 write 方法
+以下两行在事实上等价：
+sys.stdout.write('hello'+'\n')
+print 'hello'
+②：从控制台重定向到文件
+原始的 sys.stdout 指向控制台
+如果把文件的对象的引用赋给 sys.stdout，那么 print 调用的就是文件对象的 write 方法
+f_handler=open('out.log', 'w')
+sys.stdout=f_handler
+print 'hello' 
+# this hello can't be viewed on concole
+# this hello is in file out.log
+
+十三、列表推倒式
+例子：生成1-10的偶数平方根列表
+list = [x*x for x in range(1,11) if x&1==0]
+print list
+
+十四、list方法(列表方法)
+append：list末尾追加元素，修改原list，返回None
+count：统计某元素在list中出现的次数
+extend：list末尾一次性追加另一个list，修改原list
+index：list查找某个元素的第一个索引值
+insert：插入某元素
+reverse：对list逆向取反，修改原list，返回None
+sort：对list进行排序，修改原list，返回None
+
+十五、函数
+sorted函数：不修改原list，返回一个新list
+reversed函数：返回序列的反向迭代器
+
+十六、多级排序
+#对list里每个tuple的第2个和第3个多级排序
+import operator
+a = [(1,2,3), (3,4,5), (0,1,2), (0,1,1)]
+print a
+a.sort(key=operator.itemgetter(1,2))
+print a
+
+十七、print输出重定向到文件>>
+例如：
+f = open('test.txt', 'w')
+print >> f, 'hahahahaha'
+f.close()
+
+
+十八、函数的参数魔法
+①：位置参数(最基本)
+定义：
+def function(arg1,arg2):
+	print arg1,arg2
+调用：
+function(arg1,arg2)
+
+②：关键字参数(在①的基础上通过调用实现，不用按照参数顺序传参)
+调用：
+function(arg2='world',arg1='hello')
+
+③：默认值参数(将①和②结合，在函数定义时给参数添加默认值，传参时可传可不传)
+定义：
+def function(arg1='hello',arg2='world'):
+	print arg1,arg2
+调用：
+function()
+function('hi')
+function('hi','Tom')
+function(arg1=1234)
+function(arg2='Tom')
+function(arg1='abc',arg2='qwe')
+function(arg2='abc',arg1='qwe')
+
+④：收集参数，可以让用户提供任意数量的参数，用*和**实现
+4.1 位置参数的收集，用*，收集成元组
+定义：
+def func(*params):
+	print params
+调用：
+func(1,2,3,4,5,6)               #(1, 2, 3, 4, 5, 6)
+func('123','hello','world',250) #('123', 'hello', 'world', 250)
+func([11,22,33],'456','xxxx')   #([11, 22, 33], '456', 'xxxx')
+func(a,b,c,d)#a,b,c,d均为变量名
+
+4.2 默认值参数的收集，用**，收集成字典
+定义：
+def func(**kw):
+	print kw
+调用：
+func(a=1,b=2,c=3)  #{'a': 1, 'c': 3, 'b': 2}
+func(name='liyang', age=27)#{'age': 27, 'name': 'liyang'}
+
+
+with语句原理
+
+多线程实现以及对变量访问的互斥加锁
+
+__new__和__init__函数的区别，使用__new__函数来实现单例模式(Singleton)
+
+__call__的作用
+
+python回收机制(GC:garbage collection)及其解释，引用计数为主，标记-清除、分代收集为辅
+
+函数式编程思想，map和reduce等
+
+语法糖装饰器的作用，用例子实现讲解，使用情况，装饰器的实质
+
+函数递归调用，斐波那契数列的实现，用代码
+
+手写一个函数，传入一个文件路径，函数实现输出当前路径所有文件的功能
+
+Python中的@property有什么作用?如何实现成员变量的只读属性？
+
+
+
+Django相关：
+
+创建项目：django-admin startproject project_name
+创建应用：python manage.py startapp app_name
+启动网站：python manage.py runserver IP:PORT(如果IP和PORT不填,默认启动http://127.0.0.1:8000)
+		①：python manage.py runserver
+		②：python manage.py runserver 192.168.163.137:8000
+	
+Django创建项目后，项目文件夹下的组成部分
+首先创建项目：django-admin startproject mblog(项目名),会生成mblog目录
+进入mblog目录后，在创建一个应用：python manage.py startapp mysite(应用名)
+整个项目目录结构如下：
+mblog:
+	mblog(文件夹):
+		__init__.py
+		wsgi.py
+		urls.py
+		setting.py
+		template(不自动生成,可人工创建该文件夹)
+		static(不自动生成,可人工创建该文件夹)
+			image(文件夹，用于存放项目image文件)
+			css(文件夹，用于存放项目.css文件)
+			js(文件夹，用于存放项目.js文件)
+		views.py(不自动生成,可人工创建)
+		
+	manage.py(文件)
+	
+	misite(文件夹)：
+		__init__.py
+		tests.py
+		admin.py
+		models.py
+		views.py
+		migrations(文件夹)
+		template(不自动生成,可人工创建)
+		
+文件详细说明：
+①：mblog文件夹下的文件
+__init__.py: 一个空文件，作用是这个目录可以被当作模块(包)使用
+wsgi.py:项目与WSGI兼容的Web服务器入口 
+urls.py:项目的URL配置文件(网址与函数的对应)
+settings.py:项目的整体配置文件,可配置数据库，模板，中间件，静态文件，应用，语言，时区等
+
+②：manage.py文件：
+manage.py是用来管理网站配置的文件，是一个接受命令行指令的工具程序
+	
+③：misite文件夹下的文件
+__init__.py: 一个空文件，作用是这个目录可以被当作模块(包)使用
+tests.py：没什么用
+admin.py：数据库管理界面配置文件，将自己创建的模型类注册到管理界面
+models.py：模型文件，在此文件中定义数据库表模型类，每张table可定义成一个class
+views.py：视图函数文件，在此文件中定义与url正则匹配的视图函数
+migrations：是一个数据库目录，当对数据库增删改除操作时，会有相应的文件生成在此目录
+
+除此之外：
+①：模板文件
+template文件夹用于存放模板文件，即html文件，可分别在mblog和mysite目录下创建各自的template，
+mblog目录下的templates用于存放base.html, footer.html, header.html
+mysite目录下的templates用于存放适用于本app的html文件，分别{% extends base.html %}即可
+也可以将所有的html文件统一放在mblog下的templates文件夹中，进行统一管理
+
+②：静态文件
+静态文件包括image、css、js文件等，可在项目目录下创建static文件夹，然后在static文件夹下
+分别创建image、css、js文件夹，分别存储.img .css .js文件
+
+③：views.py和urls.py
+在项目目录和应用目录下都可以创建views.py和urls.py
+对于urls.py，里面使用正则表达式，将相关的url和views.py中的视图函数进行匹配，
+
+可以在项目中使用命名空间在urls.py文件中include各个应用下的urls.py，对urlpatterns进行统一管理
+例如：
+from mysite import urls(项目urls.py导入应用模块的urls.py)
+urlpatterns = [
+	url(r'^', include(urls), namespace='mysite'),
+	url(r'^admin', include(admin.site.urls)),
+]
+
+
+
+
+对MTV的理解:
+MTV即Model、Template、View，对应于MVC中的Model、View、Control
+Model->Model：M指的是Model，模型层，实现对数据库定义和存储
+Template->View：T指的是Template，视图层，实现对模型层中数据的读写操作
+View->Control：V指的是View，控制层(视图函数)，在视图函数中对数据进行获取，将数据传给Template进行渲染
+
+
+
+模型层(Model)操作：
+django项目默认数据库存储后端是SQLite,如果要修改后端存储，改成mysql，就要安装mysql并进行相应的配置。
+例如在settings.py文件中配置数据库的存储后端名称、数据库主机ip、用户名、密码等
+
+在models.py中定义好一个模型类后，如：
+from django.db import models(导入模型类)
+from django.contrib import auth
+
+创建模型类
+class User(models.Model):
+    name = models.CharField(max_length=20, null=False)
+    email = models.EmailField()
+    password = models.CharField(max_length=20, null=False)
+    enabled = models.BooleanField(default=False)
+
+设计完模型类后，要同步数据库，执行以下两条命令：
+python manage.py makemigrations app_name(创建和更新数据库中间文件，migrations目录下的东西)
+python manage.py migrate(对数据库进行创建和更新)
+
+
+通过admin.py将模型类注册到数据库管理界面：
+例如：
+from mysite.models import Post,Mood,User,Profile(导入定义的类)
+from django.contrib import admin
+
+修改此类显示界面
+class PostAdmin(admin.ModelAdmin):
+ 	list_display = ('nickname', 'message', 'enabled', 'pub_time')
+ 	ordering = ('-pub_time',)
+
+admin.site.register(Mood)
+admin.site.register(Post, PostAdmin)
+admin.site.register(User)
+admin.site.register(Profile)
+
+
+表单Form：
+可在mysite目录下创建forms.py文件，用于创建表单类
+例如：
+from django import forms(导入表单模块)
+from mysite import models
+
+①：创建表单类
+class ContactForm(forms.Form):
+	CITY = [
+		['TP', 'Taipei'],
+		['TY', 'Taoyuang'],
+		['TC', 'Taichung'],
+		['TN', 'Tainan'],
+		['KS', 'Kaohsiung'],
+		['NA', 'Others']
+	]
+
+	user_name = forms.CharField(label='您的姓名', max_length=50, initial='李大仁')
+	user_city = forms.ChoiceField(label='居住城市', choices=CITY)
+	user_school = forms.BooleanField(label='是否在学', required=False)
+	user_email = forms.EmailField(label='电子邮件')
+	user_message = forms.CharField(label='您的意见', widget=forms.Textarea)
+	
+①：创建模型表单类，将表单直接与模型相关联
+class PostForm(forms.ModelForm):
+	class Meta:
+		model = models.Post
+		fields = ['mood', 'nickname', 'message', 'del_pass']
+
+	def __init__(self, *args, **kwargs):
+		super(PostForm, self).__init__(*args, **kwargs)
+		self.fields['mood'].label = '现在的心情'
+		self.fields['nickname'].label = '您的昵称'
+		self.fields['message'].label = '心情留言'
+		self.fields['del_pass'].label = '设置密码'
+
+
+
+models.Model中常用的数据字段：
+IntegerField                  整数字段
+FloatField                    浮点数字段
+BooleanField                  布尔值
+CharFiled(max_length)         字符串
+DateField(auto_now)           日期格式，对应datetime.date
+DateTimeField                 日期格式，对应datetime.datetime
+EmailField                    电子邮件格式字段
+URLField(max_length)          和CharField一样,用于记录完整的URL                    
+TextField                     长文字格式，一般用于在HTML窗体的Textarea输入项目中
+
+
+
+
+数据的查询与编辑，常用函数与修饰词
+create()，创建一行记录
+save()，保存
+all()，返回所有QuerySet，users = User.object.all()
+filter()，返回符合指定条件的QuerySet
+order_by()，串接到QuerySet之后，针对某一指定的字段进行排序
+exclude()，返回不符合指定条件的QuerySet
+get()，获取指定符合条件的 唯一 元素，如果找不到或有一个以上的条件符合，产生异常，user = User.objects.get()
+first()/last()，获取第一个和最后一个， user = User.objects.first()/user = User.objects.last()
+exists()，用来检查是否存在某指令条件的记录，通常附加载filter()后面
+update()
+delete()，删除指定记录
+contains/icontains，如SQL语句中的LIKE和ILIKE
+in，提供一个列表，只要符合列表中的任何一个值均可
+gt/gte/lt/lte， 大于/大于等于/小于/小于等于
+iexact，不区分大小写的条件设置
+
+例如，有一个Product模型类：
+
+#####################################
+    filter()条件格式 :
+    filter(模型类属性名__条件名=值) 
+#####################################
+
+Product.objects.all()
+Product.objects.filter(qty=0)
+Product.objects.exclude(qty=0)
+Product.objects.filter(price__lte=500)
+Product.objects.filter(name__icontains='sony')
+Product.objects.filter(qty__in=[1,2])
+Product.objects.filter(name__contains='SONY').exists()
+
+
+
+
