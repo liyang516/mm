@@ -1,0 +1,187 @@
+虚拟化的两种方式(Hypervisor):
+1型虚拟化:
+Hypervisor 直接安装在物理机上，多个虚拟机在 Hypervisor 上运行。 如Xen 和 VMWare 的 ESXi 
+2型虚拟化:
+物理机上首先安装常规的操作系统，比如 Redhat、Ubuntu 和 Windows。
+Hypervisor 作为 OS 上的一个程序模块运行，并对管理虚拟机进行管理。
+如 KVM VirtualBox 和 VMWare Workstation
+
+KVM
+KVM 全称是 Kernel-Based Virtual Machine.
+KVM 本身只关注虚拟机调度和内存管理这两个方面
+IO 外设的任务交给 Linux 内核和 Qemu
+
+Libvirt
+简单说就是 KVM 的管理工具
+Libvirt 包含 3 个东西：后台 daemon 程序 libvirtd、API 库和命令行工具 virsh
+
+
+Openstack核心服务：Keystone、Glance、Nova、Cinder、Neutron、Horizon
+
+Keystone:负责用户认证和权限访问等。
+Credentials 是 User 用来证明自己身份的信息，可以是： 
+1.	用户名/密码
+2.	Token
+3.	API Key
+4.	其他高级方式
+
+Authentication 是 Keystone 验证 User 身份的过程。
+User 访问 OpenStack 时向 Keystone 提交username和password形式的 Credentials，
+Keystone 验证通过后会给 User 签发一个 Token 作为后续访问的 Credential。
+
+Glance，镜像管理，具体功能如下
+1.提供 REST API 让用户能够查询和获取 image 的元数据和 image 本身
+2.支持多种方式存储 image，包括普通的文件系统、Swift、Amazon S3 等
+3.对 Instance 执行 Snapshot 创建新的 image
+
+Glance包括glance-api、glance-registry、store backend
+1.glance-api 是系统后台运行的服务进程。 对外提供 REST API，响应 image 查询、获取和存储的调用。
+glance-api 不会真正处理请求。 
+如果操作是与 image metadata（元数据）相关，glance-api 会把请求转发给 glance-registry； 
+如果操作是与 image 自身存取相关，glance-api 会把请求转发给该 image 的 store backend。
+
+2.glance-registry
+glance-registry 是系统后台运行的服务进程。 
+负责处理和存取 image 的 metadata，例如 image 的大小和类型。
+
+3.Store backend
+Glance 自己并不存储 image。 真正的 image 是存放在 backend 中的。 Glance 支持多种 backend，包括：
+本地文件系统、ceph rbd、 cinder、swift、Amazon S3
+
+
+Nova：最核心服务，管理虚拟机生命周期
+1.nova-api，接收和响应客户的 API 调用。
+2.nova-scheduler，虚机调度服务，负责决定在哪个计算节点上运行虚机
+3.nova-compute，管理虚机的核心服务，通过调用 Hypervisor API 实现虚机生命周期管理
+4.Hypervisor，计算节点上跑的虚拟化管理程序，虚机管理最底层的程序。 不同虚拟化技术提供自己的 Hypervisor。 常用的 Hypervisor 有 KVM，Xen， VMWare 等
+5.nova-conductor，nova-compute 经常需要更新数据库。出于安全性和伸缩性的考虑，
+  nova-compute 并不会直接访问数据库，而是将这个任务委托给 nova-conductor
+6.nova-console，访问虚机的控制台的服务
+7.nova-consoleauth，负责对访问虚机控制台请求提供 Token 认证
+8.nova-cert，提供 x509 证书支持
+
+虚拟机创建流程看Nova个组件如何公作，具体流程图建附图nova.png
+1.客户（可以是 OpenStack 最终用户，也可以是其他程序）向 API（nova-api）发送请求：“帮我创建一个虚机”
+
+2.API 对请求做一些必要处理后，向 Messaging（RabbitMQ）发送了一条消息：“让 Scheduler 创建一个虚机”
+
+3.Scheduler（nova-scheduler）从 Messaging 获取到 API 发给它的消息，然后执行调度算法，从若干计算节点中选出节点 A
+
+4.Scheduler 向 Messaging 发送了一条消息：“在计算节点 A 上创建这个虚机”
+
+5.计算节点 A 的 Compute（nova-compute）从 Messaging 中获取到 Scheduler 发给它的消息，然后在本节点的 Hypervisor 上启动虚机。
+
+6.在虚机创建的过程中，Compute 如果需要查询或更新数据库信息，会通过 Messaging 向 Conductor（nova-conductor）发送消息，Conductor 负责数据库访问。
+
+
+为什么不让nova-compute直接和数据库交互和是通过nova-conductor来与数据库交互？
+1.更高的系统安全性。nova-compute运行在多个节点，如果多节点均能访问数据库，对数据库安全存在极大的风险，安全性比较低。
+2.更好的系统伸缩性。
+
+
+nova-compute 创建 instance 的过程可以分为 4 步：
+1.为 instance 准备资源
+2.创建 instance 的镜像文件
+3.创建 instance 的 XML 定义文件
+4.创建虚拟网络并启动虚拟机
+
+通过消息队列(rabbitmq)让各服务实现异步调用，发出请求后无需等待，直接返回，继续后面的公作。有如下好处：
+1.解耦各子服务。 子服务不需要知道其他服务在哪里运行，只需要发送消息给 Messaging 就能完成调用。
+2.提高性能 异步调用使得调用者无需等待结果返回。这样可以继续执行更多的工作，提高系统总的吞吐量。
+3.提高伸缩性 子服务可以根据需要进行扩展，启动更多的实例处理更多的请求，在提高可用性的同时也提高了整个系统的伸缩性。
+  而且这种变化不会影响到其他子服务，也就是说变化对别人是透明的。
+  
+  
+Cinder,包含如下几个组件：
+1.cinder-api，接收 API 请求，调用 cinder-volume 。
+2.cinder-scheduler，scheduler 通过调度算法选择最合适的存储节点创建 volume。
+3.cinder-volume，管理 volume 的服务，与 volume provider 协调工作，管理 volume 的生命周期。
+  运行 cinder-volume 服务的节点被称作为存储节点。
+4.volume provider，数据的存储设备，为 volume 提供物理存储空间。 
+  cinder-volume 支持多种 volume provider，每种 volume provider 通过自己的 driver 与cinder-volume 协调工作。
+
+  
+Neutron:
+虚拟交换机：Linux Bridge 和 Open vSwitch。
+
+Newtron的network是一个隔离的二层广播域支持多种类型，包括local、flat、VLAN、VxLAN、GRE。
+
+local：
+local 网络与其他网络和节点隔离。local 网络中的 instance 只能与位于同一节点上同一网络的 instance 通信，
+local 网络主要用于单机测试。
+
+flat
+flat 网络是无 vlan tagging 的网络。flat 网络中的 instance 能与位于同一网络的 instance 通信，并且可以跨多个节点。
+
+vlan
+vlan 网络是具有 802.1q tagging 的网络。vlan 是一个二层的广播域，同一 vlan 中的 instance 可以通信，
+不同 vlan 只能通过 router 通信。vlan 网络可跨节点，是应用最广泛的网络类型。
+
+vxlan
+vxlan 是基于隧道技术的 overlay 网络。vxlan 网络通过唯一的 segmentation ID（也叫 VNI）与其他 vxlan 网络区分。
+vxlan 中数据包会通过 VNI 封装成 UDP 包进行传输。因为二层的包通过封装在三层传输，能够克服 vlan 和物理网络基础设施的限制。
+
+gre
+gre 是与 vxlan 类似的一种 overlay 网络。主要区别在于使用 IP 包而非 UDP 进行封装。
+
+subnet
+subnet 是一个 IPv4 或者 IPv6 地址段。instance 的 IP 从 subnet 中分配。每个 subnet 需要定义 IP 地址的范围和掩码。
+
+port
+port 可以看做虚拟交换机上的一个端口。port 上定义了 MAC 地址和 IP 地址，
+当 instance 的虚拟网卡 VIF（Virtual Interface） 绑定到 port 时，port 会将 MAC 和 IP 分配给 VIF
+
+network 与 subnet 是 1对多 关系.
+subnet 与 port 是 1对多 关系。
+
+
+Neutron 由如下组件构成：
+1.Neutron Server
+对外提供 OpenStack 网络 API，接收请求，并调用 Plugin 处理请求。
+
+2.Plugin
+处理 Neutron Server 发来的请求，维护 OpenStack 逻辑网络状态， 并调用 Agent 处理请求。
+
+3.Agent
+处理 Plugin 的请求，负责在 network provider 上真正实现各种网络功能。
+
+4.network provider(Linux Bridge 或者OpenVSwitch)
+提供网络服务的虚拟或物理网络设备，例如 Linux Bridge，Open vSwitch 或者其他支持 Neutron 的物理交换机。
+
+创建一个VLAN100的network的流程，假设provider是linux bridge：
+1.Neutron Server 接收到创建 network 的请求，通过 Message Queue（RabbitMQ）通知已注册的 Linux Bridge Plugin。
+
+2.Plugin 将要创建的 network 的信息（例如名称、VLAN ID等）保存到数据库中
+  并通过 Message Queue 通知运行在各节点上的 Agent。
+
+3.Agent 收到消息后会在节点上的物理网卡（比如 eth2）上创建 VLAN 设备（比如 eth2.100），
+  并创建 bridge （比如 brqXXX） 桥接 VLAN 设备。
+  
+说明：
+plugin 解决的是 What 的问题，即网络要配置成什么样子？而至于如何配置 How 的工作则交由 agent 完成。
+plugin，agent 和 network provider 是配套使用的。LinuxBridge和OpenvSwitch分别有自己的plugin和agent
+plugin 的一个主要的职责是在数据库中维护 Neutron 网络的状态信息，用ML2 plugin代替了已经
+
+控制节点neutron组件：
+neutron-server
+
+网络节点neutron组件：
+neutron-l3-agent：创建 router，提供 Neutron subnet 之间的路由服务。路由功能默认通过 IPtables 实现。
+neutron-plugin-agent: 如neutron-linuxbridge-agent
+neutron-dhcp-agent：通过 dnsmasq 为 instance 提供 dhcp 服务。
+neutron-metadata-agent
+
+计算节点neutron组件：
+neutron-plugin-agent(neutron-linuxbridge-agent)
+
+ML2 对二层网络进行抽象和建模，引入了 type driver 和 mechansim driver。
+type driver:解耦了 Neutron 所支持的网络类型
+mechansim driver:解耦了访问这些网络类型的机制
+
+Type Driver
+Neutron 支持的每一种网络类型都有一个对应的 ML2 type driver。
+type driver 负责维护网络类型的状态，执行验证，创建网络等。 
+ML2 支持的网络类型包括 local, flat, vlan, vxlan 和 gre。 
+
+
+

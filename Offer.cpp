@@ -9,6 +9,141 @@
 #include <math.h>
 using namespace std;
 
+
+// 面试题3（一）：找出数组中重复的数字
+// 题目：在一个长度为n的数组里的所有数字都在0到n-1的范围内。数组中某些数字是重复的，但不知道有几个数字重复了，
+// 也不知道每个数字重复了几次。请找出数组中任意一个重复的数字。例如，如果输入长度为7的数组{2, 3, 1, 0, 2, 5, 3}，
+// 那么对应的输出是重复的数字2或者3。
+int FindDuplicaNum(int a[], int length)
+{
+	if(NULL==a || length<=0)
+		return -1;
+
+	for(int i=0;i<length;i++)
+	{
+		if(a[i]<0 || a[i]>length-1)
+			return -1; 
+	}
+
+	for(int i=0;i<length;i++)
+	{
+		while(a[i]!=i)
+		{
+			if(a[i]==a[a[i]])
+				return a[i];
+			int temp = a[i];
+			a[i] = a[temp];
+			a[temp] = temp;
+		}
+	}
+
+	return -1;
+
+}
+
+// 面试题3（二）：不修改数组找出重复的数字
+// 题目：在一个长度为n+1的数组里的所有数字都在1到n的范围内，所以数组中至
+// 少有一个数字是重复的。请找出数组中任意一个重复的数字，但不能修改输入的
+// 数组。例如，如果输入长度为8的数组{2, 3, 5, 4, 3, 2, 6, 7}，那么对应的
+// 输出是重复的数字2或者3。
+int countRange(int a[], int length, int start, int end)
+{
+	if(a==NULL)
+		return -1;
+	int count = 0;
+	for(int i=0;i<length;i++)
+	{
+		if(a[i]>=start && a[i]<=end)
+			++count;
+	}
+	return count;
+}
+
+
+int FindDuplicaNumNoModifyArray(int a[], int length)
+{
+	if(a==NULL||length<=0)
+		return -1;
+	for(int i=0;i<length;i++)
+	{
+		if(a[i]<1 || a[i]>length-1)
+			return -1;
+	}
+
+	int start = 1;
+	int end = length-1;
+	while(end>=start)
+	{
+		int mid = (start+end)/2;
+		int count = countRange(a,length,start,mid);
+		if(start==end)
+		{
+			if(count>1)
+				return start;
+			else
+				break;
+		}
+		if(count>mid-start+1)
+			end = mid;
+		else
+			start = mid+1;
+	}
+	return -1;
+
+}
+
+// 面试题4：二维数组中的查找
+// 题目：在一个二维数组中，每一行都按照从左到右递增的顺序排序，每一列都按
+// 照从上到下递增的顺序排序。请完成一个函数，输入这样的一个二维数组和一个
+// 整数，判断数组中是否含有该整数。
+bool FindNumInMatrix(int a[], int rows, int columns, int num)
+{
+	if(a==NULL || rows<=0 || columns<=0)
+		return false;
+	for(int row=0,column=columns-1;row<rows,column>=0;)
+	{
+		if(a[row*rows + column]==num)
+			return true;
+		else if(a[row*rows + column]>num)
+			--column;
+		else
+			++row;
+	}
+	return false;
+}
+
+// 面试题5：替换空格
+// 题目：请实现一个函数，把字符串中的每个空格替换成"%20"。例如输入“We are happy.”，
+// 则输出“We%20are%20happy.”。
+void ReplaceSpace(char a[], int strSize)
+{
+	if(a==NULL || strSize<=0)
+		return;
+	int spaceCount = 0;
+	int length = strlen(a);
+	for(int i=0;i<length;i++)
+	{
+		if(a[i]==' ')
+			spaceCount++;
+	}
+	int newLen = length+2*spaceCount;
+	if(newLen>strSize)
+		return;
+	for(;length>=0,newLen>=0;)
+	{
+		if(a[length]!=' ')
+			a[newLen--] = a[length--];
+		else
+		{
+			a[newLen--] = '0';
+			a[newLen--] = '2';
+			a[newLen--] = '%';
+			length--;
+		}
+	}
+}
+
+
 // 面试题58（一）：翻转单词顺序
 // 题目：输入一个英文句子，翻转句子中单词的顺序，但单词内字符的顺序不变。
 // 为简单起见，标点符号和普通字母一样处理。例如输入字符串"I am a student. "，
@@ -214,6 +349,17 @@ double Power(double base, int exponent)
 int main(int argc, char const *argv[])
 {
 	/* code */
+	char str[200] = "We are happy.";
+	cout<<str<<endl;
+	ReplaceSpace(str,200);
+	cout<<str<<endl;
+	// int matrix[][4] = {{1, 2, 8, 9}, {2, 4, 9, 12}, {4, 7, 10, 13}, {6, 8, 11, 15}};
+	// cout<<FindNumInMatrix((int*)matrix, 4,4,22)<<endl;
+	// int a[] = {2, 3, 1, 0, 2, 5, 3};
+	// cout<<FindDuplicaNum(a,7)<<endl;
+	// int a[] =  {2, 3, 5, 4, 3, 2, 6, 7};
+	// cout<<FindDuplicaNumNoModifyArray(a,8)<<endl;
+
 	// int Push[5] = {1,2,3,4,5};
 	// int Pop[] = {4,5,3,2,1};
 	// int Pop[5] = {4,3,5,1,2};
@@ -225,6 +371,6 @@ int main(int argc, char const *argv[])
 	// cout<<str<<endl;
 	// cout<<str2<<endl;
 
-	cout<<Power(2.0,0)<<endl;
+	// cout<<Power(2.0,0)<<endl;
 	return 0;
 }

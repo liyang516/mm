@@ -7,7 +7,7 @@
 #include <assert.h>
 using namespace std;
 
-//strcpy函数
+//strcpy
 char *Strcpy(char *dest, const char *src)
 {
 	assert(NULL!=dest && NULL!=src);
@@ -17,7 +17,7 @@ char *Strcpy(char *dest, const char *src)
 	return addr;
 }
 
-//strlen函数
+//strlen
 int Strlen(const char *src)
 {
 	if(NULL==src)
@@ -31,7 +31,7 @@ int Strlen(const char *src)
 	return len;
 }
 
-//strcmp函数
+//strcmp
 int Strcmp(const char *s1, const char *s2)
 {
 	assert(NULL!=s1 && NULL!=s2);
@@ -43,7 +43,7 @@ int Strcmp(const char *s1, const char *s2)
 	return (*s1-*s2);
 }
 
-//strcat函数
+//strcat
 char *Strcat(char *dest, const char *src)
 {
 	if(dest==NULL && src==NULL)
@@ -56,7 +56,7 @@ char *Strcat(char *dest, const char *src)
 	return addr;
 }
 
-//memcpy函数
+//memcpy
 void *Memcpy(void *dest, const void *src, int count)
 {
 	if(dest==NULL || src==NULL || count<=0)
@@ -72,7 +72,7 @@ void *Memcpy(void *dest, const void *src, int count)
 	return addr;
 }
 
-//memset函数
+//memset
 void *Memset(void *str, int ch, int count)
 {
 	if(str==NULL || count<=0)
@@ -86,6 +86,7 @@ void *Memset(void *str, int ch, int count)
 	return addr;
 }
 
+// class string
 class String{
 public:
 	String(const char *str = NULL);
@@ -140,8 +141,8 @@ String& String::operator=(const String &rhs)
 	return *this;
 }
 
-// 字符串转换成整数
-int atoi(const char *str)
+// atoi
+int Atoi(const char *str)
 {
 	assert(NULL!=str);
 	int result = 0;
@@ -162,8 +163,29 @@ int atoi(const char *str)
 	return result; 
 }
 
+// Singleton model
+class Singleton{
+public:
+	static Singleton* GetInstane()
+	{
+		if(instance==NULL)
+			instance = new Singleton();
+		return instance;
+	}
+protected:
+private:
+	Singleton(){};
+	static Singleton *instance;
+};
+
+Singleton* Singleton::instance = Singleton::GetInstane();
+
 int main(int argc, char const *argv[])
 {
 	/* code */
+	Singleton *s1 = Singleton::GetInstane();
+	Singleton *s2 = Singleton::GetInstane();
+	if(s1==s2)
+		cout<<"haha"<<endl;
 	return 0;
 }
