@@ -272,6 +272,52 @@ void DeleteListNode(ListNode **head, ListNode *deleteNode)
 	return ;
 }
 
+// 输入两个链表，找出它们的第一个公共结点
+int GetListLength(ListNode *head)
+{
+	int listLength = 0;
+	ListNode *pNode = head;
+	while(pNode!=NULL)
+	{
+		++listLength;
+		pNode = pNode->next;
+	}
+	return listLength;
+}
+
+ListNode* FindFirstCommonNode(ListNode *head1, ListNode *head2)
+{
+	int len1 = GetListLength(head1);
+	int len2 = GetListLength(head2);
+	int dif = 0;
+	ListNode *longHead = NULL;
+	ListNode *shortHead = NULL;
+	if(len1>len2)
+	{
+		dif = len1-len2;
+		longHead = head1;
+		shortHead = head2;
+	}
+	else
+	{	
+		dif = len2-len1;
+		longHead = head2;
+		shortHead = head1;
+	}
+
+	for(int i=0;i<dif;i++)
+		longHead = longHead->next;
+	while(longHead!=NULL  && shortHead!=NULL && longHead!=shortHead)
+	{
+		longHead = longHead->next;
+		shortHead = shortHead->next;
+	}
+
+
+	return longHead;
+}
+
+
 int Add(int a, int b)
 {
 	int sum,carry;
